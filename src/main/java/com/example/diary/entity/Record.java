@@ -1,5 +1,6 @@
 package com.example.diary.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
@@ -10,6 +11,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.time.ZonedDateTime;
 
@@ -28,4 +31,8 @@ public abstract class Record {
 
     @Column(name = "zonedatetime")
     private ZonedDateTime zoneDateTime;
+
+    @ManyToOne
+    @JoinColumn(name="user_id", nullable=true)
+    private User user;
 }

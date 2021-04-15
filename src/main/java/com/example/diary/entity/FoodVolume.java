@@ -1,6 +1,5 @@
 package com.example.diary.entity;
 
-import com.example.diary.enums.FoodHealthy;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,8 +8,6 @@ import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -35,7 +32,7 @@ public class FoodVolume {
 
     //how much was eaten, grams or pieces
     @Column
-    private int volume;
+    private double volume;
 
     @ManyToOne
     @JoinColumn(name="foodrecord_id", nullable=false)

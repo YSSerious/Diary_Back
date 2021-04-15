@@ -11,10 +11,6 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class DayInfo {
-    private int dayNumber;
-    private FoodDayInfo food;
-    private WaterDayInfo water;
-    private BodyResponseInfo bodyResponse;
-    private WeightInfo weight;
+public class WeightInfo {
+    private double volume;
 }

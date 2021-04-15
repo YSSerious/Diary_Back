@@ -37,9 +37,8 @@ public class Food {
     //in grams per 100 grams of product or in pieces.
     private boolean inGrams;
 
-    @Column(name = "defaultportion")
-    //in grams.
-    private Double defaultPortion;
+    @Column
+    private String note;
 
     @Column
     private double kilocalories;

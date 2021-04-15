@@ -84,7 +84,7 @@ public class FoodServiceImpl implements FoodService {
     }
 
     //@volume - how much was eaten. May be in grams or pieces, based on @inGrams.
-    private double getFoodValue(double baseValue, int volume, boolean inGrams) {
+    private double getFoodValue(double baseValue, double volume, boolean inGrams) {
         //volume in grams or pieces based on inGrams marker
         return inGrams ? (volume * baseValue) / 100 : baseValue * volume;
     }

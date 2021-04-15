@@ -11,4 +11,5 @@ public interface RecordService {
     Record saveRecord(Record record);
     List<DiaryMonth> getRecords(int year);
     DayInfo getDayInfo(int year, Month month, int day);
+    List<DayInfo> getMonthInfo(int year, Month month, Integer fromDay, Integer toDay);
 }
