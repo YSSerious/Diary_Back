@@ -2,6 +2,7 @@ package com.example.diary.services.impl;
 
 import com.example.diary.dtos.DayInfo;
 import com.example.diary.dtos.DiaryMonth;
+import com.example.diary.dtos.DiaryMonthWrapper;
 import com.example.diary.dtos.MonthDay;
 import com.example.diary.dtos.MonthDaysGeneralInfo;
 import com.example.diary.dtos.MonthTimeLine;
@@ -19,6 +20,7 @@ import com.example.diary.services.RecordService;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -31,9 +33,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
-import static java.time.temporal.TemporalAdjusters.firstDayOfYear;
-import static java.time.temporal.TemporalAdjusters.lastDayOfYear;
 
 @Service("recordServiceImpl")
 public class RecordServiceImpl implements RecordService {
@@ -55,10 +54,36 @@ public class RecordServiceImpl implements RecordService {
     }
 
     @Override
-    public List<DiaryMonth> getRecords(int year) {
-        ZonedDateTime start = ZonedDateTime.now().withYear(year).with(firstDayOfYear()).withHour(0).withMinute(0).withSecond(0).withNano(0);
-        ZonedDateTime end = ZonedDateTime.now().withYear(year).with(lastDayOfYear()).withHour(23).withMinute(59).withSecond(59);
-        return convertDiaryMonths(recordRepository.findAllByZoneDateTimeAfterAndZoneDateTimeBefore(start, end));
+    public DiaryMonth getMonthRecords(int year, Month month, String userId) {
+        return convertDiaryMonth(recordRepository.findByYearAndMonth(year, month.getValue(), userId), month);
+    }
+
+    @Override
+    public List<DiaryMonthWrapper> getYearRecords(int year, String userId) {
+        Month currentMonth = ZonedDateTime.now().getMonth();
+        return IntStream.range(1, 13).mapToObj(monthNumber -> {
+            DiaryMonthWrapper dmw = new DiaryMonthWrapper();
+            if (monthNumber != currentMonth.getValue()) {
+                boolean exist = recordRepository.isExistByYearAndMonth(year, monthNumber, userId);
+                if (exist) {
+                    YearMonth tempVar = YearMonth.now().withYear(year).withMonth(monthNumber);
+                    DiaryMonth dm = new DiaryMonth();
+                    dm.setName(tempVar.getMonth().name());
+                    dm.setGeneralInfos(getMonthDaysGeneralInfo(tempVar));
+                    dmw.setDiaryMonth(dm);
+                }
+            } else {
+                List<Record> records = recordRepository.findByYearAndMonth(year, monthNumber, userId);
+                if (!CollectionUtils.isEmpty(records)) {
+                    dmw.setDiaryMonth(convertDiaryMonth(records, currentMonth));
+                    dmw.setModalOpen(true);
+                }
+            }
+            return dmw;
+        })
+                .filter(wrapper -> wrapper.getDiaryMonth() != null)
+                .sorted(Comparator.comparing(wrapper -> Month.valueOf(wrapper.getDiaryMonth().getName()).getValue()))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -80,14 +105,14 @@ public class RecordServiceImpl implements RecordService {
     public List<DayInfo> getMonthInfo(int year, Month month, Integer fromDay, Integer toDay) {
         int from = Optional.ofNullable(fromDay).orElse(1);
         YearMonth ym = getYearMonth(ZonedDateTime.now().withYear(year).withMonth(month.getValue()));
-        int to = Optional.ofNullable(toDay).orElse(ym.lengthOfMonth()+1);
+        int to = Optional.ofNullable(toDay).orElse(ym.lengthOfMonth() + 1);
 
         return IntStream.range(from, to)
                 .mapToObj(i -> getDayInfo(year, month, i))
                 .collect(Collectors.toList());
     }
 
-    private <T extends Record> List<T> castRecord(Map<Class, List<Record>> recordsByType, Class<T> clazz){
+    private <T extends Record> List<T> castRecord(Map<Class, List<Record>> recordsByType, Class<T> clazz) {
         return Optional.ofNullable(recordsByType.get(clazz))
                 .orElse(new ArrayList<>())
                 .stream()
@@ -95,24 +120,24 @@ public class RecordServiceImpl implements RecordService {
                 .collect(Collectors.toList());
     }
 
-    private WaterDayInfo getWaterDayInfo(List<WaterRecord> waterRecords){
+    private WaterDayInfo getWaterDayInfo(List<WaterRecord> waterRecords) {
         return WaterDayInfo.builder()
                 .volume(waterRecords.stream().mapToInt(WaterRecord::getVolume).sum())
                 .build();
     }
 
-    private WeightInfo getWeightInfo(List<WeightRecord> weightRecords){
+    private WeightInfo getWeightInfo(List<WeightRecord> weightRecords) {
         return WeightInfo.builder()
                 .volume(weightRecords.stream().mapToDouble(WeightRecord::getVolume).average().orElse(0))
                 .build();
     }
 
-    private List<DiaryMonth> convertDiaryMonths(List<Record> records) {
-        return records.stream().collect(Collectors.groupingBy(record -> record.getZoneDateTime().getMonth().name()))
-                .entrySet().stream()
-                .map(recordMap -> new DiaryMonth(recordMap.getKey(), getMonthDaysGeneralInfo(recordMap.getValue()), convertMonthTimeLines(recordMap.getValue())))
-                .sorted(Comparator.comparing(dm -> Month.valueOf(dm.getName()).getValue()))
-                .collect(Collectors.toList());
+    private DiaryMonth convertDiaryMonth(List<Record> records, Month month) {
+        return DiaryMonth.builder()
+                .name(month.name())
+                .generalInfos(getMonthDaysGeneralInfo(records))
+                .timeLines(convertMonthTimeLines(records))
+                .build();
     }
 
     private List<MonthTimeLine> convertMonthTimeLines(List<Record> records) {
@@ -134,8 +159,12 @@ public class RecordServiceImpl implements RecordService {
     private List<MonthDaysGeneralInfo> getMonthDaysGeneralInfo(List<Record> records) {
         ZonedDateTime anyDateOfMonthRecord = records.get(0).getZoneDateTime();
         YearMonth ym = getYearMonth(anyDateOfMonthRecord);
-        return IntStream.range(1, ym.lengthOfMonth()+1)
-                .mapToObj(i -> new MonthDaysGeneralInfo(i, LocalDate.of(anyDateOfMonthRecord.getYear(), anyDateOfMonthRecord.getMonth(), i).getDayOfWeek().name()))
+        return getMonthDaysGeneralInfo(ym);
+    }
+
+    private List<MonthDaysGeneralInfo> getMonthDaysGeneralInfo(YearMonth yearMonth) {
+        return IntStream.range(1, yearMonth.lengthOfMonth() + 1)
+                .mapToObj(i -> new MonthDaysGeneralInfo(i, LocalDate.of(yearMonth.getYear(), yearMonth.getMonth(), i).getDayOfWeek().name()))
                 .collect(Collectors.toList());
     }
 

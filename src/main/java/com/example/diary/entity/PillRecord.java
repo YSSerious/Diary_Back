@@ -12,16 +12,16 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
-@Table(name = "foodrecord")
-public class FoodRecord extends Record{
+@Table(name = "pillrecord")
+public class PillRecord extends Record{
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy="foodRecord")
-    private List<FoodVolume> foodVolumes;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy="pillRecord")
+    private List<PillVolume> pillVolumes;
 
     @Override
     public String toString() {
-        return "FoodRecord{" +
-                "foodVolumes=" + foodVolumes +
+        return "PillRecord{" +
+                "pillVolumes=" + pillVolumes +
                 "} " + super.toString();
     }
 }

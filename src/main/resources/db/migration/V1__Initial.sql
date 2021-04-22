@@ -12,7 +12,7 @@ CREATE TABLE `user`
     `password` varchar(120)       NOT NULL,
     `email`    varchar(50) UNIQUE NOT NULL,
     PRIMARY KEY (`id`)
-)  AUTO_INCREMENT = 100000;
+) AUTO_INCREMENT = 100000;
 
 CREATE TABLE `user_role`
 (
@@ -26,7 +26,7 @@ CREATE TABLE `record`
 (
     `id`           varchar(255) NOT NULL,
     `zonedatetime` VARCHAR(255) NOT NULL,
-    `user_id` varchar(255) NOT NULL,
+    `user_id`      varchar(255) NOT NULL,
     PRIMARY KEY (`id`),
     CONSTRAINT `FK_user_id_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
 ) AUTO_INCREMENT = 100000;
@@ -62,6 +62,7 @@ CREATE TABLE `bodyresponserecord`
     `eyes`         varchar(255) NOT NULL,
     `chin`         varchar(255) NOT NULL,
     `forehead`     varchar(255) NOT NULL,
+    `note`         TEXT,
     PRIMARY KEY (`id`),
     CONSTRAINT `FK_bodyresponse_record_record_id` FOREIGN KEY (`id`) REFERENCES `record` (`id`)
 );
@@ -107,8 +108,39 @@ CREATE TABLE `foodvolume`
     CONSTRAINT `FK_food_id_foodvolume_food_id` FOREIGN KEY (`food_id`) REFERENCES `food` (`id`)
 ) AUTO_INCREMENT = 100000;
 
-INSERT INTO role(id, name) VALUES(1, 'ROLE_USER');
-INSERT INTO role(id, name) VALUES(2, 'ROLE_ADMIN');
+CREATE TABLE `pill`
+(
+    `id`              BIGINT(20) NOT NULL AUTO_INCREMENT,
+    `name`            varchar(255)         NOT NULL,
+    `ingrams`         BOOLEAN DEFAULT FALSE NOT NULL,
+    PRIMARY KEY (`id`)
+);
+
+CREATE TABLE `pillrecord`
+(
+    `id` varchar(255) NOT NULL,
+    PRIMARY KEY (`id`),
+    CONSTRAINT `FK_pill_record_record_id` FOREIGN KEY (`id`) REFERENCES `record` (`id`)
+);
+
+CREATE TABLE `pillvolume`
+(
+    `id`            varchar(255) NOT NULL,
+    `volume`        double       NOT NULL,
+    `pillrecord_id` varchar(255) NOT NULL,
+    `pill_id`       BIGINT(20) NOT NULL,
+    PRIMARY KEY (`id`),
+    CONSTRAINT `FK_pillrecord_id_pillvolume_pillrecord_id` FOREIGN KEY (`pillrecord_id`) REFERENCES `pillrecord` (`id`),
+    CONSTRAINT `FK_pill_id_pillvolume_pill_id` FOREIGN KEY (`pill_id`) REFERENCES `pill` (`id`)
+) AUTO_INCREMENT = 100000;
+
+INSERT INTO role(id, name)
+VALUES (1, 'ROLE_USER');
+INSERT INTO role(id, name)
+VALUES (2, 'ROLE_ADMIN');
+
+insert into `pill` (id, name)
+values (1, 'Pancreatin 250 mg');
 
 insert into `foodcategory` (id, name)
 values (1, 'Carbohydrate');
@@ -161,8 +193,8 @@ insert into `food` (id, name, kilocalories, proteins, carbohydrates, fats, foodH
 values (11, 'Rice (Long-grain)', 378, 7.6, 75.2, 1, 'GOOD', 1);
 insert into `food` (id, name, kilocalories, proteins, carbohydrates, fats, foodHealthy, foodcategory_id)
 values (12, 'Meat dumplings (Galya baluvana, turkey)', 144, 11.47, 18.56, 5.84, 'NORMAL', 7);
-insert into `food` (id, name, inGrams, kilocalories, proteins, carbohydrates, fats, foodHealthy, foodcategory_id)
-values (13, 'Dumplings with potato', false, 348, 12, 60, 12, 'NORMAL', 8);
+insert into `food` (id, name, inGrams, kilocalories, proteins, carbohydrates, fats, foodHealthy, foodcategory_id, note)
+values (13, 'Dumplings with potato', false, 348, 12, 60, 12, 'NORMAL', 8, '6 pieces portion');
 insert into `food` (id, name, inGrams, kilocalories, proteins, carbohydrates, fats, foodHealthy, foodcategory_id)
 values (14, 'Puree potatoes', false, 284, 5, 43, 10, 'NORMAL', 8);
 insert into `food` (id, name, inGrams, kilocalories, proteins, carbohydrates, fats, foodHealthy, foodcategory_id)
@@ -247,8 +279,8 @@ insert into `food` (id, name, inGrams, kilocalories, proteins, carbohydrates, fa
 values (54, 'Unknown (500)', false, 1500, 0, 0, 0, 'BAD', 9);
 insert into `food` (id, name, kilocalories, proteins, carbohydrates, fats, foodHealthy, foodcategory_id)
 values (55, 'Pizza BBQ', 218, 9.7, 26.3, 7.9, 'BAD', 13);
-insert into `food` (id, name, kilocalories, proteins, carbohydrates, fats, foodHealthy, foodcategory_id)
-values (56, 'Sausages (beef tm. Select)', 207, 12, 1.4, 17, 'NORMAL', 2);
+insert into `food` (id, name, kilocalories, proteins, carbohydrates, fats, foodHealthy, foodcategory_id, note)
+values (56, 'Sausages (beef tm. Select)', 207, 12, 1.4, 17, 'NORMAL', 2, 'One sausage: 95 g;');
 insert into `food` (id, name, kilocalories, proteins, carbohydrates, fats, foodHealthy, foodcategory_id)
 values (57, 'Turkey fillet', 111, 24.6, 0, 0.7, 'GOOD', 2);
 insert into `food` (id, name, inGrams, kilocalories, proteins, carbohydrates, fats, foodHealthy, foodcategory_id)
@@ -256,7 +288,7 @@ values (58, 'French fries with cheese sauce and bacon', false, 504, 12, 45, 29, 
 insert into `food` (id, name, kilocalories, proteins, carbohydrates, fats, foodHealthy, foodcategory_id)
 values (59, 'Boom choc', 554, 16, 37.7, 37.7, 'BAD', 3);
 insert into `food` (id, name, kilocalories, proteins, carbohydrates, fats, foodHealthy, foodcategory_id)
-values (60, 'Cucumber', 15, 0.8, 2.8, 0.1, 'NORMAL', 6);
+values (60, 'Cucumber', 15, 0.8, 2.8, 0.1, 'GOOD', 6);
 insert into `food` (id, name, kilocalories, proteins, carbohydrates, fats, foodHealthy, foodcategory_id, note)
 values (61, 'Banana', 96, 1.5, 21, 0.5, 'NORMAL', 5, 'One medium piece: 100 g;');
 insert into `food` (id, name, kilocalories, proteins, carbohydrates, fats, foodHealthy, foodcategory_id)
@@ -273,3 +305,15 @@ insert into `food` (id, name, kilocalories, proteins, carbohydrates, fats, foodH
 values (67, 'Salted caramel', 486, 2.6, 103.7, 51.3, 'BAD', 3);
 insert into `food` (id, name, kilocalories, proteins, carbohydrates, fats, foodHealthy, foodcategory_id)
 values (68, 'Oatmeal cookies', 437, 6.5, 71.8, 14.4, 'BAD', 3);
+insert into `food` (id, name, kilocalories, proteins, carbohydrates, fats, foodHealthy, foodcategory_id, note)
+values (69, 'Cappuccino', 30, 1.5, 2.5, 1.5, 'NOT_GOOD', 4, 'From Aroma kava or Mcdonalds, or from somewhere else... 100ml portion.');
+insert into `food` (id, name, kilocalories, proteins, carbohydrates, fats, foodHealthy, foodcategory_id)
+values (70, 'Cabbage (kapusta)', 25, 1.3, 6, 0.1, 'GOOD', 6);
+insert into `food` (id, name, kilocalories, proteins, carbohydrates, fats, foodHealthy, foodcategory_id)
+values (71, 'Tomato', 24, 1.1, 3.8, 0.2, 'GOOD', 6);
+insert into `food` (id, name, kilocalories, proteins, carbohydrates, fats, foodHealthy, foodcategory_id)
+values (72, 'Bread (Vidensky)', 275, 13.8, 45.4, 3.9, 'NORMAL', 1);
+insert into `food` (id, name, kilocalories, proteins, carbohydrates, fats, foodHealthy, foodcategory_id, note)
+values (73, 'Chumak sweet chili sauce', 148, 0.4, 37.5, 0.1, 'NOT_GOOD', 4, 'Default portion: 20 g;');
+insert into `food` (id, name, kilocalories, proteins, carbohydrates, fats, foodHealthy, foodcategory_id)
+values (74, 'Sausages (Rimskaya)', 471.2, 23, 0.3, 42, 'NORMAL', 2);

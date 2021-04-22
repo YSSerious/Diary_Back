@@ -10,6 +10,8 @@ import com.example.diary.entity.User;
 import com.example.diary.enums.ERole;
 import com.example.diary.repositories.RoleRepository;
 import com.example.diary.repositories.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -34,6 +36,8 @@ import java.util.stream.Collectors;
 @RequestMapping("/auth")
 @CrossOrigin
 public class AuthController {
+
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
     @Autowired
     AuthenticationManager authenticationManager;
@@ -64,25 +68,31 @@ public class AuthController {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
 
-        return ResponseEntity.ok(new JwtResponse(jwt,
+        JwtResponse jr = new JwtResponse(jwt,
                 userDetails.getId(),
                 userDetails.getUsername(),
                 userDetails.getEmail(),
-                roles));
+                roles);
+        logger.info("User authenticated successfully: {}", jr);
+        return ResponseEntity.ok(jr);
     }
 
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
         if (userRepository.existsByUsername(signUpRequest.getUsername())) {
+            String errorMsg = "Username " + signUpRequest.getUsername() + "is already taken!";
+            logger.error(errorMsg);
             return ResponseEntity
                     .badRequest()
-                    .body("Error: Username is already taken!");
+                    .body(errorMsg);
         }
 
         if (userRepository.existsByEmail(signUpRequest.getEmail())) {
+            String errorMsg = "Email " + signUpRequest.getEmail() + "is already in use!";
+            logger.error(errorMsg);
             return ResponseEntity
                     .badRequest()
-                    .body("Error: Email is already in use!");
+                    .body(errorMsg);
         }
 
         // Create new user's account
@@ -113,8 +123,8 @@ public class AuthController {
         }
 
         user.setRoles(roles);
-        userRepository.save(user);
-
+        User createdUser = userRepository.save(user);
+        logger.info("User registered successfully: {}", createdUser);
         return ResponseEntity.ok("User registered successfully!");
     }
 }

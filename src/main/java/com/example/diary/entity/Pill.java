@@ -16,9 +16,9 @@ import javax.persistence.Table;
 @Setter
 @NoArgsConstructor
 @Entity
+@Table(name = "pill")
 @ToString
-@Table(name = "foodcategory")
-public class FoodCategory {
+public class Pill {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", length = 20)
@@ -26,4 +26,8 @@ public class FoodCategory {
 
     @Column
     private String name;
+
+    @Column(name = "ingrams")
+    //in grams or in pieces.
+    private boolean inGrams;
 }

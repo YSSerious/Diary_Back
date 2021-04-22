@@ -1,5 +1,6 @@
 package com.example.diary.entity;
 
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,8 +19,8 @@ import javax.persistence.Table;
 @Getter
 @Setter
 @Entity
-@Table(name = "foodvolume")
-public class FoodVolume {
+@Table(name = "pillvolume")
+public class PillVolume {
 
     @Id
     @GeneratedValue(generator = "uuid")
@@ -28,23 +29,23 @@ public class FoodVolume {
     private String id;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name="food_id", nullable=false)
-    private Food food;
+    @JoinColumn(name="pill_id", nullable=false)
+    private Pill pill;
 
     //how much was eaten, grams or pieces
     @Column
     private double volume;
 
     @ManyToOne
-    @JoinColumn(name="foodrecord_id", nullable=false)
+    @JoinColumn(name="pillrecord_id", nullable=false)
     @JsonIgnore
-    private FoodRecord foodRecord;
+    private PillRecord pillRecord;
 
     @Override
     public String toString() {
-        return "FoodVolume{" +
+        return "PillVolume{" +
                 "id='" + id + '\'' +
-                ", food=" + food +
+                ", pill=" + pill +
                 ", volume=" + volume +
                 '}';
     }

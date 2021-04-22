@@ -34,4 +34,19 @@ public class BodyResponseRecord extends Record{
     @Column
     @Enumerated(EnumType.STRING)
     private BodyResponse forehead;
+
+    @Column
+    private String note;
+
+    @Override
+    public String toString() {
+        return "BodyResponseRecord{" +
+                "generalState=" + generalState +
+                ", nose=" + nose +
+                ", eyes=" + eyes +
+                ", chin=" + chin +
+                ", forehead=" + forehead +
+                ", note='" + note + '\'' +
+                "} " + super.toString();
+    }
 }

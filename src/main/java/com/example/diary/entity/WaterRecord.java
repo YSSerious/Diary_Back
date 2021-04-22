@@ -15,4 +15,11 @@ public class WaterRecord extends Record{
     //volume in milliliters.
     @Column
     private int volume;
+
+    @Override
+    public String toString() {
+        return "WaterRecord{" +
+                "volume=" + volume +
+                "} " + super.toString();
+    }
 }

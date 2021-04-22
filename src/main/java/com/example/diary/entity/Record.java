@@ -3,6 +3,7 @@ package com.example.diary.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.Column;
@@ -21,6 +22,7 @@ import java.time.ZonedDateTime;
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "record")
+@ToString
 public abstract class Record {
 
     @Id
@@ -33,6 +35,6 @@ public abstract class Record {
     private ZonedDateTime zoneDateTime;
 
     @ManyToOne
-    @JoinColumn(name="user_id", nullable=true)
+    @JoinColumn(name="user_id")
     private User user;
 }

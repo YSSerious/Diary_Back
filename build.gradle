@@ -45,3 +45,10 @@ flyway {
     password = 'password'
     schemas = ['diarydb']
 }
+
+//flyway {
+//    url = 'jdbc:mysql://diarymysql.c24lxohlmeks.eu-central-1.rds.amazonaws.com:3308/diarydb'
+//    user = 'root'
+//    password = '66623666'
+//    schemas = ['diarydb']
+//}
