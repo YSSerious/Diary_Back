@@ -13,5 +13,5 @@ import lombok.Setter;
 @AllArgsConstructor
 public class DiaryMonthWrapper {
     private DiaryMonth diaryMonth;
-    private boolean isModalOpen = false;
+    private boolean isModalOpen;
 }
