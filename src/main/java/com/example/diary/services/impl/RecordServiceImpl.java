@@ -30,6 +30,7 @@ import java.time.YearMonth;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -95,7 +96,13 @@ public class RecordServiceImpl implements RecordService {
         ZonedDateTime start = ZonedDateTime.now().withYear(year).withMonth(month.getValue()).withDayOfMonth(day).withHour(0).withMinute(0).withSecond(0).withNano(0);
         ZonedDateTime end = ZonedDateTime.now().withYear(year).withMonth(month.getValue()).withDayOfMonth(day).withHour(23).withMinute(59).withSecond(59);
         List<Record> dayRecords = recordRepository.findAllByZoneDateTimeAfterAndZoneDateTimeBefore(start, end);
-        logger.info("DayInfo records: {}.\nFor year: {}, month: {}, day: {}", dayRecords, year, month, day);
+        logger.info("DayInfo records: {}.\n For year: {}, month: {}, day: {}. Records amount: {}", dayRecords.stream().map(x -> {
+            Map<String, String> map = new HashMap<>();
+            map.put("id", x.getId());
+            map.put("date", x.getZoneDateTime().toString());
+            map.put("zone", x.getZoneDateTime().getZone().toString());
+            return map;
+        }).collect(Collectors.toList()), year, month, day, dayRecords.size());
         Map<Class, List<Record>> recordsByType = dayRecords.stream().collect(Collectors.groupingBy(Record::getClass));
         return DayInfo.builder()
                 .dayNumber(day)
