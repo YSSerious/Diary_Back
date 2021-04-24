@@ -108,7 +108,9 @@ public class FoodController {
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public List<FoodVolumeInfo> getFoodDayTimeLineInfo(@RequestBody List<String> foodRecordsIds) {
         logger.info("Getting food day/timeline info. foodRecordsIds: {}", foodRecordsIds);
-        return foodService.getFoodDayTimeLineInfo(foodRecordsIds);
+        List<FoodVolumeInfo> foodVolumeInfos = foodService.getFoodDayTimeLineInfo(foodRecordsIds);
+        logger.info("Food day/timeline volumes: {}", foodVolumeInfos);
+        return foodVolumeInfos;
     }
 
     @GetMapping("/getDayInfo")

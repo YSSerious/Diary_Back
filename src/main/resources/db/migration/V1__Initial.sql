@@ -1,6 +1,6 @@
 CREATE TABLE `role`
 (
-    `id`   BIGINT(20) NOT NULL AUTO_INCREMENT,
+    `id`   BIGINT NOT NULL AUTO_INCREMENT,
     `name` varchar(20) UNIQUE NOT NULL,
     PRIMARY KEY (`id`)
 );
@@ -17,7 +17,7 @@ CREATE TABLE `user`
 CREATE TABLE `user_role`
 (
     `user_id` varchar(255) NOT NULL,
-    `role_id` BIGINT(20) NOT NULL,
+    `role_id` BIGINT NOT NULL,
     CONSTRAINT `FK_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`),
     CONSTRAINT `FK_role_id` FOREIGN KEY (`role_id`) REFERENCES `role` (`id`)
 );
@@ -69,14 +69,14 @@ CREATE TABLE `bodyresponserecord`
 
 CREATE TABLE `foodcategory`
 (
-    `id`   BIGINT(20) NOT NULL AUTO_INCREMENT,
+    `id`   BIGINT NOT NULL AUTO_INCREMENT,
     `name` varchar(255) UNIQUE NOT NULL,
     PRIMARY KEY (`id`)
 );
 
 CREATE TABLE `food`
 (
-    `id`              BIGINT(20) NOT NULL AUTO_INCREMENT,
+    `id`              BIGINT NOT NULL AUTO_INCREMENT,
     `name`            varchar(255)         NOT NULL,
     `ingrams`         BOOLEAN DEFAULT TRUE NOT NULL,
     `kilocalories`    double               NOT NULL,
@@ -84,7 +84,7 @@ CREATE TABLE `food`
     `carbohydrates`   double               NOT NULL,
     `fats`            double               NOT NULL,
     `foodHealthy`     varchar(255)         NOT NULL,
-    `foodcategory_id` BIGINT(20) NOT NULL,
+    `foodcategory_id` BIGINT NOT NULL,
     `note`            TEXT,
     PRIMARY KEY (`id`),
     CONSTRAINT `FK_food_category_id_foodcategory_id` FOREIGN KEY (`foodcategory_id`) REFERENCES `foodcategory` (`id`)
@@ -102,7 +102,7 @@ CREATE TABLE `foodvolume`
     `id`            varchar(255) NOT NULL,
     `volume`        double       NOT NULL,
     `foodrecord_id` varchar(255) NOT NULL,
-    `food_id`       BIGINT(20) NOT NULL,
+    `food_id`       BIGINT NOT NULL,
     PRIMARY KEY (`id`),
     CONSTRAINT `FK_foodrecord_id_foodvolume_foodrecord_id` FOREIGN KEY (`foodrecord_id`) REFERENCES `foodrecord` (`id`),
     CONSTRAINT `FK_food_id_foodvolume_food_id` FOREIGN KEY (`food_id`) REFERENCES `food` (`id`)
@@ -110,7 +110,7 @@ CREATE TABLE `foodvolume`
 
 CREATE TABLE `pill`
 (
-    `id`              BIGINT(20) NOT NULL AUTO_INCREMENT,
+    `id`              BIGINT NOT NULL AUTO_INCREMENT,
     `name`            varchar(255)         NOT NULL,
     `ingrams`         BOOLEAN DEFAULT FALSE NOT NULL,
     PRIMARY KEY (`id`)
@@ -128,16 +128,24 @@ CREATE TABLE `pillvolume`
     `id`            varchar(255) NOT NULL,
     `volume`        double       NOT NULL,
     `pillrecord_id` varchar(255) NOT NULL,
-    `pill_id`       BIGINT(20) NOT NULL,
+    `pill_id`       BIGINT NOT NULL,
     PRIMARY KEY (`id`),
     CONSTRAINT `FK_pillrecord_id_pillvolume_pillrecord_id` FOREIGN KEY (`pillrecord_id`) REFERENCES `pillrecord` (`id`),
     CONSTRAINT `FK_pill_id_pillvolume_pill_id` FOREIGN KEY (`pill_id`) REFERENCES `pill` (`id`)
 ) AUTO_INCREMENT = 100000;
 
+INSERT INTO user(id, username, password, email)
+VALUES ('2d3deea7-bb02-4a72-a891-1f7e5d9fe617',	'oleksii', '$2a$10$zkuhBkkbFcwcWj6dQ7cpsuMqYPy/WjtWEkLk4R2HHCyh0dxeKdAEu',	'kozakaleksei@gmail.com');
+
 INSERT INTO role(id, name)
 VALUES (1, 'ROLE_USER');
 INSERT INTO role(id, name)
 VALUES (2, 'ROLE_ADMIN');
+
+INSERT INTO user_role(user_id, role_id)
+VALUES ('2d3deea7-bb02-4a72-a891-1f7e5d9fe617',	1);
+INSERT INTO user_role(user_id, role_id)
+VALUES ('2d3deea7-bb02-4a72-a891-1f7e5d9fe617',	2);
 
 insert into `pill` (id, name)
 values (1, 'Pancreatin 250 mg');
