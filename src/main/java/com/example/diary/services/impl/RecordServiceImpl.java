@@ -18,6 +18,8 @@ import com.example.diary.repositories.UserRepository;
 import com.example.diary.services.FoodService;
 import com.example.diary.services.RecordService;
 import org.apache.commons.lang3.tuple.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -36,6 +38,8 @@ import java.util.stream.IntStream;
 
 @Service("recordServiceImpl")
 public class RecordServiceImpl implements RecordService {
+
+    private static final Logger logger = LoggerFactory.getLogger(RecordServiceImpl.class);
 
     @Autowired
     private RecordRepository recordRepository;
@@ -91,8 +95,8 @@ public class RecordServiceImpl implements RecordService {
         ZonedDateTime start = ZonedDateTime.now().withYear(year).withMonth(month.getValue()).withDayOfMonth(day).withHour(0).withMinute(0).withSecond(0).withNano(0);
         ZonedDateTime end = ZonedDateTime.now().withYear(year).withMonth(month.getValue()).withDayOfMonth(day).withHour(23).withMinute(59).withSecond(59);
         List<Record> dayRecords = recordRepository.findAllByZoneDateTimeAfterAndZoneDateTimeBefore(start, end);
+        logger.info("DayInfo records: {}.\nFor year: {}, month: {}, day: {}", dayRecords, year, month, day);
         Map<Class, List<Record>> recordsByType = dayRecords.stream().collect(Collectors.groupingBy(Record::getClass));
-
         return DayInfo.builder()
                 .dayNumber(day)
                 .food(foodService.getFoodDayInfo(castRecord(recordsByType, FoodRecord.class)))

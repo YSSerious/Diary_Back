@@ -14,7 +14,6 @@ import com.example.diary.entity.Record;
 import com.example.diary.entity.WaterRecord;
 import com.example.diary.entity.WeightRecord;
 import com.example.diary.enums.BodyResponse;
-import com.example.diary.repositories.PillRepository;
 import com.example.diary.services.FoodService;
 import com.example.diary.services.PillService;
 import com.example.diary.services.impl.RecordServiceImpl;
